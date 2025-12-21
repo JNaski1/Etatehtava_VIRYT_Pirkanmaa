@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8" />
+  <title>Pirkanmaan viranomaistoimijat</title>
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <style>
+    body { margin: 0; }
+    #map { height: 100vh; }
+
+    /* PELASTUSTOIMI – punainen */
+    .pelastus-marker {
+      width: 12px;
+      height: 12px;
+      background-color: red;
+      border: 2px solid white;
+      border-radius: 50%;
+    }
+
+    /* POLIISI – sininen */
+    .poliisi-marker {
+      width: 12px;
+      height: 12px;
+      background-color: blue;
+      border: 2px solid white;
+      border-radius: 50%;
+    }
+
+    /* SAIRALA / HOITOYKSIKKÖ – vihreä */
+    .sairaala-marker {
+      width: 12px;
+      height: 12px;
+      background-color: green;
+      border: 2px solid white;
+      border-radius: 50%;
+    }
+
+    /* PUOLUSTUSVOIMAT – musta */
+    .puolustusvoimat-marker {
+      width: 12px;
+      height: 12px;
+      background-color: black;
+      border: 2px solid white;
+      border-radius: 50%;
+    }
+
+    .popup-title {
+      font-weight: bold;
+    }
+
+    .popup-section {
+      margin-top: 6px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+  // Kartta
+  var map = L.map('map').setView([61.7, 23.7], 8);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  // Ikonit
+  var pelastusIcon = L.divIcon({
+    className: '',
+    html: '<div class="pelastus-marker"></div>',
+    iconSize: [12, 12],
+    iconAnchor: [6, 6]
+  });
+
+  var poliisiIcon = L.divIcon({
+    className: '',
+    html: '<div class="poliisi-marker"></div>',
+    iconSize: [12, 12],
+    iconAnchor: [6, 6]
+  });
+
+  var sairaalaIcon = L.divIcon({
+    className: '',
+    html: '<div class="sairaala-marker"></div>',
+    iconSize: [12, 12],
+    iconAnchor: [6, 6]
+  });
+
+  var puolustusvoimatIcon = L.divIcon({
+    className: '',
+    html: '<div class="puolustusvoimat-marker"></div>',
+    iconSize: [12, 12],
+    iconAnchor: [6, 6]
+  });
+
+  var allMarkers = [];
+
+  // YLEINEN MARKERIFUNKTIO
+  function createMarker(p, icon, tyyppiLabel) {
+
+    var popupHtml =
+      "<div class='popup-title'>" + p.nimi + "</div>" +
+      p.kunta +
+      "<div class='popup-section'><strong>Tyyppi:</strong> " + tyyppiLabel + "</div>" +
+      "<div class='popup-section'><strong>Päätehtävät:</strong><br>" + p.paatehtavat + "</div>" +
+      "<div class='popup-section'><strong>Maanpuolustusmerkitys:</strong><br>" + p.maanpuolustusmerkitys + "</div>";
+
+    var m = L.marker([p.lat, p.lon], { icon: icon })
+      .addTo(map)
+      .bindPopup(popupHtml);
+
+    // Hover
+    m.on('mouseover', function () {
+      this.openPopup();
+    });
+
+    m.on('mouseout', function () {
+      this.closePopup();
+    });
+
+    allMarkers.push(m);
+  }
+
+  // Pelastustoimi
+  fetch('pelastustoimi.json')
+    .then(r => r.json())
+    .then(data => {
+      data.forEach(p => {
+        createMarker(p, pelastusIcon, 'Pelastustoimi');
+      });
+      fitAll();
+    });
+
+  // Poliisi
+  fetch('poliisi.json')
+    .then(r => r.json())
+    .then(data => {
+      data.forEach(p => {
+        createMarker(p, poliisiIcon, 'Poliisi');
+      });
+      fitAll();
+    });
+
+  // Sairaalat ja hoitoyksiköt (PIRHA)
+  fetch('hva.json')
+    .then(r => r.json())
+    .then(data => {
+      data.forEach(p => {
+        createMarker(p, sairaalaIcon, 'Sairaala / hoitoyksikkö');
+      });
+      fitAll();
+    });
+
+  // Puolustusvoimat
+  fetch('puolustusvoimat.json')
+    .then(r => r.json())
+    .then(data => {
+      data.forEach(p => {
+        createMarker(p, puolustusvoimatIcon, 'Puolustusvoimat');
+      });
+      fitAll();
+    });
+
+  // Zoomaus kaikkiin pisteisiin
+  function fitAll() {
+    if (allMarkers.length > 0) {
+      var group = L.featureGroup(allMarkers);
+      map.fitBounds(group.getBounds());
+    }
+  }
+</script>
+
+</body>
+</html>
