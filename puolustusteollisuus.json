@@ -1,0 +1,6 @@
+[
+  { "nimi":"Saab","kunta":"Tampere","tyyppi":"puolustusteollisuus","lat":61.4967,"lon":23.7603,"paatehtavat":"Puolustusvoimien ICT-järjestelmien tuki","maanpuolustusmerkitys":"Suorituskykyjen tekninen toteutus ja tuki" },
+  { "nimi":"Patria","kunta":"Tampere","tyyppi":"puolustusteollisuus","lat":61.4886,"lon":23.7796,"paatehtavat":"Puolustusvoimien ICT-järjestelmien tuki","maanpuolustusmerkitys":"Suorituskykyjen tekninen toteutus ja tuki" },
+  { "nimi":"Millog","kunta":"Tampere","tyyppi":"puolustusteollisuus","lat":61.4886,"lon":23.7796,"paatehtavat":"Täydennetään","maanpuolustusmerkitys":"Täydennetään" },
+  { "nimi":"Insta","kunta":"Tampere","tyyppi":"puolustusteollisuus","lat":61.4309,"lon":23.7859,"paatehtavat":"Täydennetään","maanpuolustusmerkitys":"Täydennetään" }
+]

@@ -1,6 +1,6 @@
 [
-  { "nimi": "TAYS Keskussairaala", "kunta": "Tampere", "lat": 61.5049, "lon": 23.8143, "paatehtavat": "Erikoissairaanhoito, päivystys, erikoisosaaminen", "maanpuolustusmerkitys": "Yhdyskunnan terveydenhuollon kriittinen resurssi poikkeusoloissa" },
-  { "nimi": "Hatanpään sairaala", "kunta": "Tampere", "lat": 61.4931, "lon": 23.7903, "paatehtavat": "Kuntoutus, sisätautien hoito, poliklinikka- ja osaosastotoiminnot", "maanpuolustusmerkitys": "Tukee sairaanhoidon kapasiteettia ja väestön hoitovalmiutta" },
-  { "nimi": "Sastamalan sairaala", "kunta": "Sastamala", "lat": 61.33752, "lon": 22.92142, "paatehtavat": "Perussairaanhoito ja hoitoyksikkö lähellä asutusta", "maanpuolustusmerkitys": "Alueellinen hoitokapasiteetti poikkeusoloissa" },
-  { "nimi": "Valkeakosken sairaala", "kunta": "Valkeakoski", "lat": 61.27048, "lon": 24.03208, "paatehtavat": "Perusterveydenhuolto, hoitotoiminnot", "maanpuolustusmerkitys": "Alueellinen hoitovalmius kriisitilanteissa" }
+  { "nimi":"TAYS Keskussairaala","kunta":"Tampere","lat":61.5043,"lon":23.8157,"paatehtavat":"Erikoissairaanhoito, päivystys, erikoisosaaminen","maanpuolustusmerkitys":"Yhdyskunnan terveydenhuollon kriittinen resurssi poikkeusoloissa" },
+  { "nimi":"Hatanpään sairaala","kunta":"Tampere","lat":61.4928,"lon":23.7866,"paatehtavat":"Kuntoutus, sisätautien hoito, poliklinikka- ja osaosastotoiminnot","maanpuolustusmerkitys":"Tukee sairaanhoidon kapasiteettia ja väestön hoitovalmiutta" },
+  { "nimi":"Sastamalan sairaala","kunta":"Sastamala","lat":61.3381,"lon":22.9189,"paatehtavat":"Perussairaanhoito ja hoitoyksikkö lähellä asutusta","maanpuolustusmerkitys":"Alueellinen hoitokapasiteetti poikkeusoloissa" },
+  { "nimi":"Valkeakosken sairaala","kunta":"Valkeakoski","lat":61.2696,"lon":24.0309,"paatehtavat":"Perusterveydenhuolto, hoitotoiminnot","maanpuolustusmerkitys":"Alueellinen hoitovalmius kriisitilanteissa" }
 ]

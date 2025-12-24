@@ -1,0 +1,22 @@
+[
+  { "nimi":"Ruskon vedenpuhdistuslaitos","kunta":"Tampere","tyyppi":"pintavesilaitos","lat":61.5487,"lon":23.8846,"paatehtavat":"Talousveden tuotanto pintavedestä","maanpuolustusmerkitys":"Pirkanmaan kriittisin talousveden tuotantolaitos" },
+  { "nimi":"Kaupinojan vedenpuhdistuslaitos","kunta":"Tampere","tyyppi":"pintavesilaitos","lat":61.5049,"lon":23.8226,"paatehtavat":"Talousveden tuotanto ja varavesilaitos","maanpuolustusmerkitys":"Vesihuollon varajärjestelmä poikkeusoloissa" },
+  { "nimi":"Nokian pintavedenpuhdistuslaitos","kunta":"Nokia","tyyppi":"pintavesilaitos","lat":61.4706,"lon":23.5074,"paatehtavat":"Talousveden tuotanto pintavedestä","maanpuolustusmerkitys":"Kaupunkiseudun merkittävä vesihuoltokohde" },
+  { "nimi":"Valkeakosken pintavedenpuhdistuslaitos","kunta":"Valkeakoski","tyyppi":"pintavesilaitos","lat":61.2664,"lon":24.0383,"paatehtavat":"Talousveden tuotanto pintavedestä","maanpuolustusmerkitys":"Paikallisesti kriittinen vesihuollon tuotantolaitos" },
+
+  { "nimi":"Tampereen pohjavesilaitokset","kunta":"Tampere","tyyppi":"pohjavesilaitos","lat":61.4981,"lon":23.7608,"paatehtavat":"Pohjaveden tuotanto varajärjestelmänä","maanpuolustusmerkitys":"Pintavesijärjestelmän varmistava kapasiteetti" },
+  { "nimi":"Kangasalan pohjavesilaitokset","kunta":"Kangasala","tyyppi":"pohjavesilaitos","lat":61.4639,"lon":24.0760,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Kunnan vesihuollon perusta" },
+  { "nimi":"Lempäälän pohjavesilaitokset","kunta":"Lempäälä","tyyppi":"pohjavesilaitos","lat":61.3167,"lon":23.7524,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Väestönhuollon perusinfrastruktuuri" },
+  { "nimi":"Pirkkalan pohjavesilaitokset","kunta":"Pirkkala","tyyppi":"pohjavesilaitos","lat":61.4636,"lon":23.6326,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Kaupunkiseudun vesihuollon jatkuvuus" },
+  { "nimi":"Ylöjärven pohjavesilaitokset","kunta":"Ylöjärvi","tyyppi":"pohjavesilaitos","lat":61.5562,"lon":23.5960,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Laajan kunta-alueen vesihuollon perusta" },
+  { "nimi":"Oriveden pohjavesilaitokset","kunta":"Orivesi","tyyppi":"pohjavesilaitos","lat":61.6783,"lon":24.3575,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Kunnan omavarainen vedenhankinta" },
+  { "nimi":"Mänttä-Vilppulan pohjavesilaitokset","kunta":"Mänttä-Vilppula","tyyppi":"pohjavesilaitos","lat":62.0296,"lon":24.5042,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Paikallisesti kriittinen vesihuolto" },
+  { "nimi":"Virtain pohjavesilaitokset","kunta":"Virrat","tyyppi":"pohjavesilaitos","lat":62.2404,"lon":23.7723,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Haja-asutusalueen vesihuollon perusta" },
+  { "nimi":"Parkanon pohjavesilaitokset","kunta":"Parkano","tyyppi":"pohjavesilaitos","lat":62.0119,"lon":23.0256,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Harjualueeseen perustuva vesihuolto" },
+  { "nimi":"Ikaalisten pohjavesilaitokset","kunta":"Ikaalinen","tyyppi":"pohjavesilaitos","lat":61.7697,"lon":23.0651,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Paikallinen huoltovarmuuskohde" },
+  { "nimi":"Sastamalan pohjavesilaitokset","kunta":"Sastamala","tyyppi":"pohjavesilaitos","lat":61.3431,"lon":22.9080,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Laajan kunnan vesihuollon perusrakenne" },
+  { "nimi":"Ruoveden pohjavesilaitokset","kunta":"Ruovesi","tyyppi":"pohjavesilaitos","lat":61.9856,"lon":24.0569,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Omavarainen vesihuolto poikkeusoloissa" },
+  { "nimi":"Juupajoen pohjavesilaitokset","kunta":"Juupajoki","tyyppi":"pohjavesilaitos","lat":61.7992,"lon":24.3704,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Pienen kunnan kriittinen infrastruktuuri" },
+  { "nimi":"Kihniön pohjavesilaitokset","kunta":"Kihniö","tyyppi":"pohjavesilaitos","lat":62.2086,"lon":23.1799,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Harvaan asutun alueen vesihuollon perusta" },
+  { "nimi":"Vesilahden pohjavesilaitokset","kunta":"Vesilahti","tyyppi":"pohjavesilaitos","lat":61.3074,"lon":23.6179,"paatehtavat":"Pohjaveden tuotanto talousvedeksi","maanpuolustusmerkitys":"Paikallinen vedenhankinta ja varajärjestelmä" }
+]

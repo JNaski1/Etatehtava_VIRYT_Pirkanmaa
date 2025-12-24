@@ -10,6 +10,48 @@
 
   <style>
     body { margin: 0; font-family: Arial, sans-serif; }
+
+    #header {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(255,255,255,0.95);
+      padding: 8px 16px;
+      border-radius: 6px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+    }
+
+    #header h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    #subtitle {
+      margin-top: 4px;
+      font-size: 13px;
+      color: #444;
+      text-align: center;
+    }
+
+    #subtitle:empty:before {
+      content: 'Kirjoita tähän vapaamuotoinen alaotsikko…';
+      color: #999;
+    }
+
+    .panel {
+      margin-bottom: 10px;
+    }
+
+    .panel-actions {
+      margin-bottom: 6px;
+    }
+
+    .panel-actions button {
+      margin-right: 4px;
+    }
     #map { height: 100vh; }
 
     /* UI-paneeli */
@@ -69,6 +111,45 @@
     .sairaala-marker { background-color: green; }
     .puolustusvoimat-marker { background-color: black; }
     .puolustusteollisuus-marker { background-color: rgb(249, 232, 0); }
+    .tulli-marker {
+      background-color: purple;
+      width: 12px;
+      height: 12px;
+      border: 2px solid white;
+      border-radius: 50%;
+    }
+
+    .rajavartiolaitos-marker {
+      background-color: brown;
+      width: 12px;
+      height: 12px;
+      border: 2px solid white;
+      border-radius: 50%;
+    }
+
+    .liikenne-marker {
+      background-color: gray;
+      width: 12px;
+      height: 12px;
+      border: 2px solid white;
+      border-radius: 50%;
+    }
+
+    .energia-marker {
+      background-color: orange;
+      width: 12px;
+      height: 12px;
+      border: 2px solid white;
+      border-radius: 50%;
+    }
+
+    .vesihuolto-marker {
+      background-color: teal;
+      width: 12px;
+      height: 12px;
+      border: 2px solid white;
+      border-radius: 50%;
+    }
 
     /* Popup */
     .popup-title { font-weight: bold; }
@@ -77,14 +158,28 @@
 </head>
 <body>
 
-<div id="controls">
-  <h3>Viranomaiset</h3>
-  <div id="typeFilters"></div>
+<div id="header">
+  <h1>Pirkanmaan viranomaistoimijat</h1>
+  <div id="subtitle">Viranomaisyhteistyötehtävä</div>
+</div>
+</div>
 
-  <h3>Kunta</h3>
-  <select id="municipalityFilter">
-    <option value="">Kaikki kunnat</option>
-  </select>
+<div id="controls">
+  <div class="panel">
+    <h3>Viranomaiset</h3>
+    <div class="panel-actions">
+      <button type="button" id="selectAll">Näytä kaikki</button>
+      <button type="button" id="deselectAll">Piilota kaikki</button>
+    </div>
+    <div id="typeFilters"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Kunta</h3>
+    <select id="municipalityFilter">
+      <option value="">Kaikki kunnat</option>
+    </select>
+  </div>
 </div>
 
 <div id="legend"></div>
@@ -99,7 +194,12 @@
     { key: 'poliisi', url: 'poliisi.json', label: 'Poliisi', css: 'poliisi-marker' },
     { key: 'sairaala', url: 'hva.json', label: 'Sairaala / hoitoyksikkö', css: 'sairaala-marker' },
     { key: 'puolustusvoimat', url: 'puolustusvoimat.json', label: 'Puolustusvoimat', css: 'puolustusvoimat-marker' },
-    { key: 'puolustusteollisuus', url: 'puolustusteollisuus.json', label: 'Puolustusteollisuus', css: 'puolustusteollisuus-marker' }
+    { key: 'puolustusteollisuus', url: 'puolustusteollisuus.json', label: 'Puolustusteollisuus', css: 'puolustusteollisuus-marker' },
+    { key: 'tulli', url: 'tulli.json', label: 'Tulli', css: 'tulli-marker' },
+    { key: 'rajavartiolaitos', url: 'rajavartiolaitos.json', label: 'Rajavartiolaitos', css: 'rajavartiolaitos-marker' },
+    { key: 'liikenne', url: 'liikenne.json', label: 'Liikenne', css: 'liikenne-marker' },
+    { key: 'energia', url: 'energia.json', label: 'Energia', css: 'energia-marker' },
+    { key: 'vesihuolto', url: 'vesihuolto.json', label: 'Vesihuolto', css: 'vesihuolto-marker' }
   ];
 
   // ==============================
@@ -207,6 +307,7 @@
   // ==============================
   function initFilters() {
     var typeContainer = document.getElementById('typeFilters');
+    var checkboxes = [];
 
     for (var i = 0; i < DATASETS.length; i++) {
       (function(d) {
@@ -215,12 +316,29 @@
         label.innerHTML = '<input type="checkbox" id="' + id + '" checked> ' + d.label;
         typeContainer.appendChild(label);
 
-        document.getElementById(id).addEventListener('change', function(e) {
+        var cb = document.getElementById(id);
+        checkboxes.push(cb);
+
+        cb.addEventListener('change', function(e) {
           if (e.target.checked) map.addLayer(layers[d.key]);
           else map.removeLayer(layers[d.key]);
         });
       })(DATASETS[i]);
     }
+
+    document.getElementById('selectAll').addEventListener('click', function() {
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = true;
+        map.addLayer(layers[DATASETS[i].key]);
+      }
+    });
+
+    document.getElementById('deselectAll').addEventListener('click', function() {
+      for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false;
+        map.removeLayer(layers[DATASETS[i].key]);
+      }
+    });
 
     var select = document.getElementById('municipalityFilter');
     var keys = Object.keys(municipalities);
@@ -275,4 +393,5 @@
   }
 </script>
 
-</b
+</body>
+</html>
