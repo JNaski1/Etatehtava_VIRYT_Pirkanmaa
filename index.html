@@ -4,13 +4,30 @@
   <meta charset="utf-8" />
   <title>Pirkanmaan viranomaistoimijat</title>
 
-  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js">function getColor(cssClass) {
+    var colors = {
+      'pelastus-marker': 'red',
+      'poliisi-marker': 'blue',
+      'sairaala-marker': 'green',
+      'puolustusvoimat-marker': 'black',
+      'puolustusteollisuus-marker': '#f9e800',
+      'tulli-marker': 'purple',
+      'rajavartiolaitos-marker': 'brown',
+      'liikenne-marker': 'gray',
+      'energia-marker': 'orange',
+      'vesihuolto-marker': 'teal'
+    };
+    return colors[cssClass] || 'black';
+  }
+
+</script>
 
   <style>
     body { margin: 0; font-family: Arial, sans-serif; }
+    #map { height: 100vh; }
 
+    /* ===== HEADER ===== */
     #header {
       position: absolute;
       top: 10px;
@@ -21,58 +38,37 @@
       padding: 8px 16px;
       border-radius: 6px;
       box-shadow: 0 1px 5px rgba(0,0,0,0.3);
-    }
-
-    #header h1 {
-      margin: 0;
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    #subtitle {
-      margin-top: 4px;
-      font-size: 13px;
-      color: #444;
       text-align: center;
     }
 
-    #subtitle:empty:before {
-      content: 'Kirjoita tähän vapaamuotoinen alaotsikko…';
-      color: #999;
+    #header h1 { margin: 0; font-size: 18px; }
+    #subtitle { margin-top: 4px; font-size: 13px; color: #444; }
+
+    /* ===== CONTROLS ===== */
+    #controls {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      z-index: 1000;
+      width: 260px;
     }
 
     .panel {
-      margin-bottom: 10px;
-    }
-
-    .panel-actions {
-      margin-bottom: 6px;
-    }
-
-    .panel-actions button {
-      margin-right: 4px;
-    }
-    #map { height: 100vh; }
-
-    /* UI-paneeli */
-    #controls {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
       background: white;
       padding: 10px;
       border-radius: 4px;
       box-shadow: 0 1px 5px rgba(0,0,0,0.3);
-      max-width: 260px;
+      margin-bottom: 10px;
       font-size: 14px;
     }
 
-    #controls h3 { margin: 0 0 6px 0; font-size: 14px; }
-    #controls label { display: block; margin-bottom: 4px; }
-    #controls select { width: 100%; margin-top: 4px; }
+    .panel h3 { margin: 0 0 6px 0; font-size: 14px; }
+    .panel label { display: block; margin-bottom: 4px; }
 
-    /* Selite */
+    .panel-actions { margin-bottom: 6px; }
+    .panel-actions button { margin-right: 4px; }
+
+    /* ===== LEGEND ===== */
     #legend {
       position: absolute;
       bottom: 10px;
@@ -86,74 +82,35 @@
     }
 
     .legend-item { display: flex; align-items: center; margin-bottom: 4px; }
+
+    /* legend-dot käyttää samaa marker-logiikkaa */
     .legend-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
+      width: 12px;
+      height: 12px;
       border: 2px solid white;
+      border-radius: 50%;
       margin-right: 6px;
     }
 
-    /* Markerityylit */
-    .pelastus-marker,
-    .poliisi-marker,
-    .sairaala-marker,
-    .puolustusvoimat-marker,
-    .puolustusteollisuus-marker {
+    /* ===== MARKERIT (YHTENÄINEN) ===== */
+    .marker {
       width: 12px;
       height: 12px;
       border: 2px solid white;
       border-radius: 50%;
+      pointer-events: auto;
     }
 
-    .pelastus-marker { background-color: red; }
-    .poliisi-marker { background-color: blue; }
-    .sairaala-marker { background-color: green; }
-    .puolustusvoimat-marker { background-color: black; }
-    .puolustusteollisuus-marker { background-color: rgb(249, 232, 0); }
-    .tulli-marker {
-      background-color: purple;
-      width: 12px;
-      height: 12px;
-      border: 2px solid white;
-      border-radius: 50%;
-    }
-
-    .rajavartiolaitos-marker {
-      background-color: brown;
-      width: 12px;
-      height: 12px;
-      border: 2px solid white;
-      border-radius: 50%;
-    }
-
-    .liikenne-marker {
-      background-color: gray;
-      width: 12px;
-      height: 12px;
-      border: 2px solid white;
-      border-radius: 50%;
-    }
-
-    .energia-marker {
-      background-color: orange;
-      width: 12px;
-      height: 12px;
-      border: 2px solid white;
-      border-radius: 50%;
-    }
-
-    .vesihuolto-marker {
-      background-color: teal;
-      width: 12px;
-      height: 12px;
-      border: 2px solid white;
-      border-radius: 50%;
-    }
-
-    /* Popup */
-    .popup-title { font-weight: bold; }
-    .popup-section { margin-top: 6px; font-size: 0.9em; }
+    .pelastus-marker { background:red; }
+    .poliisi-marker { background:blue; }
+    .sairaala-marker { background:green; }
+    .puolustusvoimat-marker { background:black; }
+    .puolustusteollisuus-marker { background:rgb(249,232,0); }
+    .tulli-marker { background:purple; }
+    .rajavartiolaitos-marker { background:brown; }
+    .liikenne-marker { background:gray; }
+    .energia-marker { background:orange; }
+    .vesihuolto-marker { background:teal; }
   </style>
 </head>
 <body>
@@ -161,7 +118,6 @@
 <div id="header">
   <h1>Pirkanmaan viranomaistoimijat</h1>
   <div id="subtitle">Viranomaisyhteistyötehtävä</div>
-</div>
 </div>
 
 <div id="controls">
@@ -186,212 +142,186 @@
 <div id="map"></div>
 
 <script>
-  // ==============================
-  // KONFIGURAATIO
-  // ==============================
+  /* ============================== */
+  /* DATASETS */
+  /* ============================== */
   var DATASETS = [
-    { key: 'pelastus', url: 'pelastustoimi.json', label: 'Pelastustoimi', css: 'pelastus-marker' },
-    { key: 'poliisi', url: 'poliisi.json', label: 'Poliisi', css: 'poliisi-marker' },
-    { key: 'sairaala', url: 'hva.json', label: 'Sairaala / hoitoyksikkö', css: 'sairaala-marker' },
-    { key: 'puolustusvoimat', url: 'puolustusvoimat.json', label: 'Puolustusvoimat', css: 'puolustusvoimat-marker' },
-    { key: 'puolustusteollisuus', url: 'puolustusteollisuus.json', label: 'Puolustusteollisuus', css: 'puolustusteollisuus-marker' },
-    { key: 'tulli', url: 'tulli.json', label: 'Tulli', css: 'tulli-marker' },
-    { key: 'rajavartiolaitos', url: 'rajavartiolaitos.json', label: 'Rajavartiolaitos', css: 'rajavartiolaitos-marker' },
-    { key: 'liikenne', url: 'liikenne.json', label: 'Liikenne', css: 'liikenne-marker' },
-    { key: 'energia', url: 'energia.json', label: 'Energia', css: 'energia-marker' },
-    { key: 'vesihuolto', url: 'vesihuolto.json', label: 'Vesihuolto', css: 'vesihuolto-marker' }
+    { key:'pelastus', url:'pelastustoimi.json', label:'Pelastustoimi', css:'pelastus-marker' },
+    { key:'poliisi', url:'poliisi.json', label:'Poliisi', css:'poliisi-marker' },
+    { key:'sairaala', url:'hva.json', label:'Sairaala / hoitoyksikkö', css:'sairaala-marker' },
+    { key:'puolustusvoimat', url:'puolustusvoimat.json', label:'Puolustusvoimat', css:'puolustusvoimat-marker' },
+    { key:'puolustusteollisuus', url:'puolustusteollisuus.json', label:'Puolustusteollisuus', css:'puolustusteollisuus-marker' },
+    { key:'tulli', url:'tulli.json', label:'Tulli', css:'tulli-marker' },
+    { key:'rajavartiolaitos', url:'rajavartiolaitos.json', label:'Rajavartiolaitos', css:'rajavartiolaitos-marker' },
+    { key:'liikenne', url:'liikenne.json', label:'Liikenne', css:'liikenne-marker' },
+    { key:'energia', url:'energia.json', label:'Energia', css:'energia-marker' },
+    { key:'vesihuolto', url:'vesihuolto.json', label:'Vesihuolto', css:'vesihuolto-marker' }
   ];
 
-  // ==============================
-  // KARTTA
-  // ==============================
-  var map = L.map('map').setView([61.7, 23.7], 8);
+  /* ============================== */
+  /* KARTTA */
+  /* ============================== */
+  var map = L.map('map').setView([61.7,23.7],8);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'© OpenStreetMap' }).addTo(map);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
-  }).addTo(map);
-
-  // ==============================
-  // IKONIT JA LAYERIT
-  // ==============================
-  function createIcon(cssClass) {
-    return L.divIcon({
-      className: cssClass,
-      html: '',
-      iconSize: [12, 12],
-      iconAnchor: [6, 6]
-    });
-  }
-
-  var icons = {};
+  
+  var icons = {}; // ei käytössä enää, circleMarker ei tarvitse ikoneita
   var layers = {};
   var allMarkers = [];
   var municipalities = {};
 
-  for (var i = 0; i < DATASETS.length; i++) {
-    icons[DATASETS[i].key] = createIcon(DATASETS[i].css);
+  for(var i=0;i<DATASETS.length;i++){
     layers[DATASETS[i].key] = L.layerGroup().addTo(map);
   }
 
-  // ==============================
-  // POPUP
-  // ==============================
-  function buildPopup(p, label) {
-    return '' +
-      '<div class="popup-title">' + p.nimi + '</div>' +
-      p.kunta +
-      '<div class="popup-section"><strong>Tyyppi:</strong> ' + label + '</div>' +
-      '<div class="popup-section"><strong>Päätehtävät:</strong><br>' + p.paatehtavat + '</div>' +
-      '<div class="popup-section"><strong>Maanpuolustusmerkitys:</strong><br>' + p.maanpuolustusmerkitys + '</div>';
+  /* ============================== */
+  /* MARKERIT */
+  /* ============================== */
+  function buildTooltip(p, d){
+    return '<strong>' + p.nimi + '</strong><br>' +
+           p.kunta + '<br>' +
+           '<em>' + d.label + '</em>';
   }
 
-  // ==============================
-  // MARKERIT
-  // ==============================
-  function addMarker(p, icon, layer, label, datasetKey) {
+
+  function addMarker(p, d){
     if (p.lat === undefined || p.lon === undefined) return;
 
-    var marker = L.marker([p.lat, p.lon], { icon: icon })
-      .bindPopup(buildPopup(p, label));
+    var m = L.circleMarker([p.lat, p.lon], {
+      radius: 6,
+      color: '#ffffff',
+      weight: 2,
+      fillColor: getColor(d.css),
+      fillOpacity: 1
+    }).bindTooltip(buildTooltip(p, d), {
+      direction: 'top',
+      offset: [0, -6],
+      opacity: 0.95,
+      sticky: true
+    });
 
-    marker.datasetKey = datasetKey;
-    marker.municipality = p.kunta;
+    m.datasetKey = d.key;
+    m.municipality = p.kunta;
 
-    marker.addTo(layer);
-    allMarkers.push(marker);
+    m.addTo(layers[d.key]);
+    allMarkers.push(m);
     municipalities[p.kunta] = true;
   }
 
-  // ==============================
-  // DATA LATAUS (TUKI KAHDELLE MUODOLLE)
-  // ==============================
+  /* ============================== */
+  /* DATA LATAUS */
+  /* ============================== */
   var loaded = 0;
 
-  function loadDataset(def) {
-    fetch(def.url)
-      .then(function(r) { return r.json(); })
-      .then(function(json) {
-        var items;
-
-        if (Array.isArray(json)) {
-          items = json;
-        } else if (json && Array.isArray(json.kohteet)) {
-          items = json.kohteet;
-        } else {
-          console.error('Virheellinen JSON:', def.url, json);
-          return;
-        }
-
-        for (var i = 0; i < items.length; i++) {
-          addMarker(items[i], icons[def.key], layers[def.key], def.label, def.key);
-        }
+  function loadDataset(d){
+    fetch(d.url)
+      .then(r => r.json())
+      .then(json => {
+        var arr = Array.isArray(json) ? json : json.kohteet;
+        if(!arr) return;
+        for(var i=0;i<arr.length;i++) addMarker(arr[i], d);
       })
-      .catch(function(err) {
-        console.error('JSON lataus epäonnistui:', def.url, err);
-      })
-      .finally(function() {
+      .finally(() => {
         loaded++;
-        if (loaded === DATASETS.length) {
+        if(loaded === DATASETS.length){
           initFilters();
+          buildLegend();
           fitAll();
         }
       });
   }
 
-  for (var i = 0; i < DATASETS.length; i++) {
-    loadDataset(DATASETS[i]);
+  for(var i=0;i<DATASETS.length;i++) loadDataset(DATASETS[i]);
+
+  /* ============================== */
+  /* FILTTERIT – VAIN MARKERIT */
+  /* ============================== */
+  function initFilters(){
+    initTypeFilters();
+    initMunicipalityFilter();
   }
 
-  // ==============================
-  // FILTTERIT
-  // ==============================
-  function initFilters() {
-    var typeContainer = document.getElementById('typeFilters');
-    var checkboxes = [];
+  function initTypeFilters(){
+    var c = document.getElementById('typeFilters');
+    c.innerHTML = '';
 
-    for (var i = 0; i < DATASETS.length; i++) {
-      (function(d) {
-        var id = 'chk-' + d.key;
-        var label = document.createElement('label');
-        label.innerHTML = '<input type="checkbox" id="' + id + '" checked> ' + d.label;
-        typeContainer.appendChild(label);
-
-        var cb = document.getElementById(id);
-        checkboxes.push(cb);
-
-        cb.addEventListener('change', function(e) {
-          if (e.target.checked) map.addLayer(layers[d.key]);
-          else map.removeLayer(layers[d.key]);
-        });
-      })(DATASETS[i]);
+    for(var i=0;i<DATASETS.length;i++){
+      var d = DATASETS[i];
+      var l = document.createElement('label');
+      l.innerHTML = '<input type="checkbox" id="chk-'+d.key+'" checked> '+d.label;
+      c.appendChild(l);
+      document.getElementById('chk-'+d.key).onchange = applyFilters;
     }
 
-    document.getElementById('selectAll').addEventListener('click', function() {
-      for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = true;
-        map.addLayer(layers[DATASETS[i].key]);
-      }
-    });
-
-    document.getElementById('deselectAll').addEventListener('click', function() {
-      for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = false;
-        map.removeLayer(layers[DATASETS[i].key]);
-      }
-    });
-
-    var select = document.getElementById('municipalityFilter');
-    var keys = Object.keys(municipalities);
-    keys.sort();
-
-    for (var j = 0; j < keys.length; j++) {
-      var opt = document.createElement('option');
-      opt.value = keys[j];
-      opt.textContent = keys[j];
-      select.appendChild(opt);
-    }
-
-    select.addEventListener('change', applyMunicipalityFilter);
-    buildLegend();
+    document.getElementById('selectAll').onclick = function(){ setAllTypes(true); };
+    document.getElementById('deselectAll').onclick = function(){ setAllTypes(false); };
   }
 
-  function applyMunicipalityFilter() {
-    var selected = document.getElementById('municipalityFilter').value;
+  function initMunicipalityFilter(){
+    var sel = document.getElementById('municipalityFilter');
+    sel.innerHTML = '<option value="">Kaikki kunnat</option>';
 
-    for (var i = 0; i < allMarkers.length; i++) {
+    var keys = Object.keys(municipalities).sort();
+    for(var i=0;i<keys.length;i++){
+      var o = document.createElement('option');
+      o.value = keys[i];
+      o.textContent = keys[i];
+      sel.appendChild(o);
+    }
+
+    sel.onchange = applyFilters;
+  }
+
+  function setAllTypes(val){
+    for(var i=0;i<DATASETS.length;i++){
+      document.getElementById('chk-'+DATASETS[i].key).checked = val;
+    }
+    applyFilters();
+  }
+
+  function applyFilters(){
+    var activeTypes = {};
+    var mun = document.getElementById('municipalityFilter').value;
+
+    for(var i=0;i<DATASETS.length;i++){
+      var id = 'chk-'+DATASETS[i].key;
+      if(document.getElementById(id).checked) activeTypes[DATASETS[i].key] = true;
+    }
+
+    // markerit lisätään/poistetaan, layerit pysyvät aina päällä
+    for(var i=0;i<allMarkers.length;i++){
       var m = allMarkers[i];
-      var visible = !selected || m.municipality === selected;
-      if (visible) m.addTo(layers[m.datasetKey]);
+      var show = activeTypes[m.datasetKey] && (!mun || m.municipality === mun);
+      if(show) m.addTo(layers[m.datasetKey]);
       else layers[m.datasetKey].removeLayer(m);
     }
   }
 
-  // ==============================
-  // LEGENDA
-  // ==============================
-  function buildLegend() {
-    var legend = document.getElementById('legend');
-    legend.innerHTML = '<strong>Värikoodien selitykset</strong><br>';
+  /* ============================== */
+  /* LEGENDA */
+  /* ============================== */
+  function buildLegend(){
+    var l = document.getElementById('legend');
+    l.innerHTML = '<strong>Värikoodien selitykset</strong><br>';
 
-    for (var i = 0; i < DATASETS.length; i++) {
+    for(var i=0;i<DATASETS.length;i++){
       var d = DATASETS[i];
-      var item = document.createElement('div');
-      item.className = 'legend-item';
-      item.innerHTML = '<div class="legend-dot ' + d.css + '"></div>' + d.label;
-      legend.appendChild(item);
+      l.innerHTML += '<div class="legend-item"><div class="legend-dot marker '+d.css+'"></div>'+d.label+'</div>';
     }
   }
 
-  // ==============================
-  // ZOOM
-  // ==============================
-  function fitAll() {
-    if (allMarkers.length > 0) {
-      var group = L.featureGroup(allMarkers);
-      map.fitBounds(group.getBounds(), { padding: [20, 20] });
+  /* ============================== */
+  /* ZOOM */
+  /* ============================== */
+  function fitAll(){
+    if (allMarkers.length) {
+      map.fitBounds(L.featureGroup(allMarkers).getBounds(), { padding: [20, 20] });
     }
+    setTimeout(function () {
+      map.invalidateSize();
+    }, 0);
   }
+
 </script>
-
 </body>
 </html>
