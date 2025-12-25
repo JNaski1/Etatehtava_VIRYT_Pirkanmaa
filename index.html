@@ -1,33 +1,17 @@
 <!DOCTYPE html>
+
 <html lang="fi">
 <head>
   <meta charset="utf-8" />
   <title>Pirkanmaan viranomaistoimijat</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js">function getColor(cssClass) {
-    var colors = {
-      'pelastus-marker': 'red',
-      'poliisi-marker': 'blue',
-      'sairaala-marker': 'green',
-      'puolustusvoimat-marker': 'black',
-      'puolustusteollisuus-marker': '#f9e800',
-      'tulli-marker': 'purple',
-      'rajavartiolaitos-marker': 'brown',
-      'liikenne-marker': 'gray',
-      'energia-marker': 'orange',
-      'vesihuolto-marker': 'teal'
-    };
-    return colors[cssClass] || 'black';
-  }
-
-</script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <style>
     body { margin: 0; font-family: Arial, sans-serif; }
     #map { height: 100vh; }
 
-    /* ===== HEADER ===== */
     #header {
       position: absolute;
       top: 10px;
@@ -41,13 +25,11 @@
       text-align: center;
     }
 
-    #header h1 { margin: 0; font-size: 18px; }
-    #subtitle { margin-top: 4px; font-size: 13px; color: #444; }
+    #header h1 { margin: 0; font-size: 12px; font-weight: 500; }
 
-    /* ===== CONTROLS ===== */
     #controls {
       position: absolute;
-      bottom: 10px;
+      top: 70px;
       right: 10px;
       z-index: 1000;
       width: 260px;
@@ -65,10 +47,6 @@
     .panel h3 { margin: 0 0 6px 0; font-size: 14px; }
     .panel label { display: block; margin-bottom: 4px; }
 
-    .panel-actions { margin-bottom: 6px; }
-    .panel-actions button { margin-right: 4px; }
-
-    /* ===== LEGEND ===== */
     #legend {
       position: absolute;
       bottom: 10px;
@@ -82,23 +60,19 @@
     }
 
     .legend-item { display: flex; align-items: center; margin-bottom: 4px; }
-
-    /* legend-dot käyttää samaa marker-logiikkaa */
     .legend-dot {
       width: 12px;
       height: 12px;
-      border: 2px solid white;
       border-radius: 50%;
+      border: 2px solid white;
       margin-right: 6px;
     }
 
-    /* ===== MARKERIT (YHTENÄINEN) ===== */
     .marker {
       width: 12px;
       height: 12px;
       border: 2px solid white;
       border-radius: 50%;
-      pointer-events: auto;
     }
 
     .pelastus-marker { background:red; }
@@ -112,21 +86,20 @@
     .energia-marker { background:orange; }
     .vesihuolto-marker { background:teal; }
   </style>
+
 </head>
 <body>
 
 <div id="header">
-  <h1>Pirkanmaan viranomaistoimijat</h1>
-  <div id="subtitle">Viranomaisyhteistyötehtävä</div>
+  <h1><b>Pirkanmaan viranomaistoimijat</b></h1>
+  <div id="subtitle">SOJO viranomaisyhteistyötehtävä</div>
 </div>
 
 <div id="controls">
   <div class="panel">
     <h3>Viranomaiset</h3>
-    <div class="panel-actions">
-      <button type="button" id="selectAll">Näytä kaikki</button>
-      <button type="button" id="deselectAll">Piilota kaikki</button>
-    </div>
+    <button id="selectAll">Näytä kaikki</button>
+    <button id="deselectAll">Piilota kaikki</button>
     <div id="typeFilters"></div>
   </div>
 
@@ -142,10 +115,7 @@
 <div id="map"></div>
 
 <script>
-  /* ============================== */
-  /* DATASETS */
-  /* ============================== */
-  var DATASETS = [
+  const DATASETS = [
     { key:'pelastus', url:'pelastustoimi.json', label:'Pelastustoimi', css:'pelastus-marker' },
     { key:'poliisi', url:'poliisi.json', label:'Poliisi', css:'poliisi-marker' },
     { key:'sairaala', url:'hva.json', label:'Sairaala / hoitoyksikkö', css:'sairaala-marker' },
@@ -158,47 +128,32 @@
     { key:'vesihuolto', url:'vesihuolto.json', label:'Vesihuolto', css:'vesihuolto-marker' }
   ];
 
-  /* ============================== */
-  /* KARTTA */
-  /* ============================== */
-  var map = L.map('map').setView([61.7,23.7],8);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'© OpenStreetMap' }).addTo(map);
+  const map = L.map('map').setView([61.7, 23.7], 8);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
-  
-  var icons = {}; // ei käytössä enää, circleMarker ei tarvitse ikoneita
-  var layers = {};
-  var allMarkers = [];
-  var municipalities = {};
-
-  for(var i=0;i<DATASETS.length;i++){
-    layers[DATASETS[i].key] = L.layerGroup().addTo(map);
+  function createIcon(css) {
+    return L.divIcon({ className: 'marker ' + css, iconSize: [12, 12] });
   }
 
-  /* ============================== */
-  /* MARKERIT */
-  /* ============================== */
-  function buildTooltip(p, d){
-    return '<strong>' + p.nimi + '</strong><br>' +
-           p.kunta + '<br>' +
-           '<em>' + d.label + '</em>';
-  }
+  const icons = {}, layers = {}, allMarkers = [], municipalities = {};
 
+  DATASETS.forEach(d => {
+    icons[d.key] = createIcon(d.css);
+    layers[d.key] = L.layerGroup().addTo(map);
+  });
 
-  function addMarker(p, d){
-    if (p.lat === undefined || p.lon === undefined) return;
+  function addMarker(p, d) {
+    if (p.lat == null || p.lon == null) return;
 
-    var m = L.circleMarker([p.lat, p.lon], {
-      radius: 6,
-      color: '#ffffff',
-      weight: 2,
-      fillColor: getColor(d.css),
-      fillOpacity: 1
-    }).bindTooltip(buildTooltip(p, d), {
-      direction: 'top',
-      offset: [0, -6],
-      opacity: 0.95,
-      sticky: true
-    });
+    const m = L.marker([p.lat, p.lon], { icon: icons[d.key] });
+
+    m.bindPopup(`
+      <strong>${p.nimi}</strong><br>
+      ${p.kunta}<br>
+      <em>${d.label}</em><br><br>
+      ${p.paatehtavat ? `<strong>Päätehtävät:</strong><br>${p.paatehtavat}<br><br>` : ''}
+      ${p.maanpuolustusmerkitys ? `<strong>Maanpuolustusmerkitys:</strong><br>${p.maanpuolustusmerkitys}` : ''}
+    `);
 
     m.datasetKey = d.key;
     m.municipality = p.kunta;
@@ -208,22 +163,19 @@
     municipalities[p.kunta] = true;
   }
 
-  /* ============================== */
-  /* DATA LATAUS */
-  /* ============================== */
-  var loaded = 0;
+  let loaded = 0;
 
-  function loadDataset(d){
+  function loadDataset(d) {
     fetch(d.url)
       .then(r => r.json())
       .then(json => {
-        var arr = Array.isArray(json) ? json : json.kohteet;
-        if(!arr) return;
-        for(var i=0;i<arr.length;i++) addMarker(arr[i], d);
+        const arr = Array.isArray(json) ? json : json.kohteet;
+        if (!arr) return;
+        arr.forEach(p => addMarker(p, d));
       })
       .finally(() => {
         loaded++;
-        if(loaded === DATASETS.length){
+        if (loaded === DATASETS.length) {
           initFilters();
           buildLegend();
           fitAll();
@@ -231,97 +183,62 @@
       });
   }
 
-  for(var i=0;i<DATASETS.length;i++) loadDataset(DATASETS[i]);
+  DATASETS.forEach(loadDataset);
 
-  /* ============================== */
-  /* FILTTERIT – VAIN MARKERIT */
-  /* ============================== */
-  function initFilters(){
-    initTypeFilters();
-    initMunicipalityFilter();
-  }
-
-  function initTypeFilters(){
-    var c = document.getElementById('typeFilters');
-    c.innerHTML = '';
-
-    for(var i=0;i<DATASETS.length;i++){
-      var d = DATASETS[i];
-      var l = document.createElement('label');
-      l.innerHTML = '<input type="checkbox" id="chk-'+d.key+'" checked> '+d.label;
+  function initFilters() {
+    const c = document.getElementById('typeFilters');
+    DATASETS.forEach(d => {
+      const l = document.createElement('label');
+      l.innerHTML = `<input type="checkbox" id="chk-${d.key}" checked> ${d.label}`;
       c.appendChild(l);
-      document.getElementById('chk-'+d.key).onchange = applyFilters;
-    }
+      document.getElementById(`chk-${d.key}`).onchange = applyFilters;
+    });
 
-    document.getElementById('selectAll').onclick = function(){ setAllTypes(true); };
-    document.getElementById('deselectAll').onclick = function(){ setAllTypes(false); };
-  }
+    document.getElementById('selectAll').onclick = () => setAllTypes(true);
+    document.getElementById('deselectAll').onclick = () => setAllTypes(false);
 
-  function initMunicipalityFilter(){
-    var sel = document.getElementById('municipalityFilter');
-    sel.innerHTML = '<option value="">Kaikki kunnat</option>';
-
-    var keys = Object.keys(municipalities).sort();
-    for(var i=0;i<keys.length;i++){
-      var o = document.createElement('option');
-      o.value = keys[i];
-      o.textContent = keys[i];
+    const sel = document.getElementById('municipalityFilter');
+    Object.keys(municipalities).sort().forEach(k => {
+      const o = document.createElement('option');
+      o.value = k;
+      o.textContent = k;
       sel.appendChild(o);
-    }
-
+    });
     sel.onchange = applyFilters;
   }
 
-  function setAllTypes(val){
-    for(var i=0;i<DATASETS.length;i++){
-      document.getElementById('chk-'+DATASETS[i].key).checked = val;
-    }
+  function setAllTypes(v) {
+    DATASETS.forEach(d => document.getElementById(`chk-${d.key}`).checked = v);
     applyFilters();
   }
 
-  function applyFilters(){
-    var activeTypes = {};
-    var mun = document.getElementById('municipalityFilter').value;
+  function applyFilters() {
+    const active = {};
+    const mun = document.getElementById('municipalityFilter').value;
 
-    for(var i=0;i<DATASETS.length;i++){
-      var id = 'chk-'+DATASETS[i].key;
-      if(document.getElementById(id).checked) activeTypes[DATASETS[i].key] = true;
-    }
+    DATASETS.forEach(d => {
+      if (document.getElementById(`chk-${d.key}`).checked) active[d.key] = true;
+    });
 
-    // markerit lisätään/poistetaan, layerit pysyvät aina päällä
-    for(var i=0;i<allMarkers.length;i++){
-      var m = allMarkers[i];
-      var show = activeTypes[m.datasetKey] && (!mun || m.municipality === mun);
-      if(show) m.addTo(layers[m.datasetKey]);
+    allMarkers.forEach(m => {
+      const show = active[m.datasetKey] && (!mun || m.municipality === mun);
+      if (show) m.addTo(layers[m.datasetKey]);
       else layers[m.datasetKey].removeLayer(m);
-    }
+    });
   }
 
-  /* ============================== */
-  /* LEGENDA */
-  /* ============================== */
-  function buildLegend(){
-    var l = document.getElementById('legend');
+  function buildLegend() {
+    const l = document.getElementById('legend');
     l.innerHTML = '<strong>Värikoodien selitykset</strong><br>';
-
-    for(var i=0;i<DATASETS.length;i++){
-      var d = DATASETS[i];
-      l.innerHTML += '<div class="legend-item"><div class="legend-dot marker '+d.css+'"></div>'+d.label+'</div>';
-    }
+    DATASETS.forEach(d => {
+      l.innerHTML += `<div class="legend-item"><div class="legend-dot ${d.css}"></div>${d.label}</div>`;
+    });
   }
 
-  /* ============================== */
-  /* ZOOM */
-  /* ============================== */
-  function fitAll(){
-    if (allMarkers.length) {
-      map.fitBounds(L.featureGroup(allMarkers).getBounds(), { padding: [20, 20] });
-    }
-    setTimeout(function () {
-      map.invalidateSize();
-    }, 0);
+  function fitAll() {
+    if (allMarkers.length) map.fitBounds(L.featureGroup(allMarkers).getBounds(), { padding: [20,20] });
   }
-
 </script>
+
 </body>
 </html>
