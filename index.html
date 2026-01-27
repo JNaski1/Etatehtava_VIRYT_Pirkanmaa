@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fi">
 <head>
   <meta charset="utf-8" />
@@ -10,7 +9,7 @@
 
   <style>
     body { margin: 0; font-family: Arial, sans-serif; }
-    #map { height: 100vh; }
+    #map { position:absolute; top:0; left:0; right:0; bottom:120px; }
 
     #header {
       position: absolute;
@@ -45,16 +44,16 @@
     }
 
     .panel h3 { margin: 0 0 6px 0; font-size: 14px; }
-    .panel label { display: block; margin-bottom: 4px; }
+    .panel label { display: block; margin-bottom: 4px; cursor: pointer; }
 
     #legend {
       position: absolute;
-      bottom: 10px;
+      top: 110px;
       left: 10px;
-      z-index: 1000;
-      background: white;
+      z-index: 900;
+      background: rgba(255,255,255,0.95);
       padding: 8px;
-      border-radius: 4px;
+      border-radius: 6px;
       box-shadow: 0 1px 5px rgba(0,0,0,0.3);
       font-size: 13px;
     }
@@ -68,30 +67,42 @@
       margin-right: 6px;
     }
 
-    .marker {
-      width: 12px;
-      height: 12px;
-      border: 2px solid white;
-      border-radius: 50%;
-    }
-
+    .marker { width: 12px; height: 12px; border: 2px solid white; border-radius: 50%; }
+    .energia-marker { background:orange; }
+    .kunnat-marker { background:rgb(74,78,61); }
+    .seurakunnat-marker { background:rgb(138,43,226); }
+    .liikenne-marker { background:gray; }
     .pelastus-marker { background:red; }
     .poliisi-marker { background:blue; }
-    .sairaala-marker { background:green; }
     .puolustusvoimat-marker { background:black; }
     .puolustusteollisuus-marker { background:rgb(249,232,0); }
-    .tulli-marker { background:purple; }
+    .sairaala-marker { background:green; }
     .rajavartiolaitos-marker { background:brown; }
-    .liikenne-marker { background:gray; }
-    .energia-marker { background:orange; }
+    .tulli-marker { background:purple; }
     .vesihuolto-marker { background:teal; }
-  </style>
 
+    #bottomBar {
+      position:absolute;
+      bottom:0; left:0; right:0;
+      height:140px;
+      background: rgba(255,255,255,0.95);
+      color:#000;
+      overflow-y:auto;
+      padding:10px 14px;
+      box-sizing:border-box;
+      z-index:1000;
+      box-shadow:0 -2px 6px rgba(0,0,0,0.25);
+    }
+
+    #bottomBar table { width:100%; border-collapse:collapse; font-size:13px; }
+    #bottomBar th, #bottomBar td { border-bottom:1px solid #ccc; padding:6px 8px; text-align:left; }
+    #bottomBar th { font-weight:600; color:#000; }
+  </style>
 </head>
 <body>
 
 <div id="header">
-  <h1><b>Pirkanmaan viranomaistoimijat</b></h1>
+  <h1>Pirkanmaan viranomaistoimijat</h1>
   <div id="subtitle">Etätehtävä</div>
 </div>
 
@@ -113,54 +124,60 @@
 
 <div id="legend"></div>
 <div id="map"></div>
+<div id="bottomBar"></div>
 
 <script>
   const DATASETS = [
+    { key:'energia', url:'energia.json', label:'Energia', css:'energia-marker' },
+    { key:'kunnat', url:'kaupungit_kunnat.json', label:'Kaupungit ja kunnat', css:'kunnat-marker' },
+    { key:'seurakunnat', url:'seurakunnat.json', label:'Seurakunnat', css:'seurakunnat-marker' },
+    { key:'liikenne', url:'liikenne.json', label:'Liikenne', css:'liikenne-marker' },
     { key:'pelastus', url:'pelastustoimi.json', label:'Pelastustoimi', css:'pelastus-marker' },
     { key:'poliisi', url:'poliisi.json', label:'Poliisi', css:'poliisi-marker' },
-    { key:'sairaala', url:'hva.json', label:'Sairaala / hoitoyksikkö', css:'sairaala-marker' },
     { key:'puolustusvoimat', url:'puolustusvoimat.json', label:'Puolustusvoimat', css:'puolustusvoimat-marker' },
     { key:'puolustusteollisuus', url:'puolustusteollisuus.json', label:'Puolustusteollisuus', css:'puolustusteollisuus-marker' },
-    { key:'tulli', url:'tulli.json', label:'Tulli', css:'tulli-marker' },
+    { key:'terveydenhuolto', url:'hva.json', label:'Terveydenhuolto', css:'sairaala-marker' },
     { key:'rajavartiolaitos', url:'rajavartiolaitos.json', label:'Rajavartiolaitos', css:'rajavartiolaitos-marker' },
-    { key:'liikenne', url:'liikenne.json', label:'Liikenne', css:'liikenne-marker' },
-    { key:'energia', url:'energia.json', label:'Energia', css:'energia-marker' },
+    { key:'tulli', url:'tulli.json', label:'Tulli', css:'tulli-marker' },
     { key:'vesihuolto', url:'vesihuolto.json', label:'Vesihuolto', css:'vesihuolto-marker' }
   ];
 
   const map = L.map('map').setView([61.7, 23.7], 8);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
-  function createIcon(css) {
-    return L.divIcon({ className: 'marker ' + css, iconSize: [12, 12] });
-  }
+  const icons = {}, layers = {}, allMarkers = [], municipalities = new Set(), counts = {};
 
-  const icons = {}, layers = {}, allMarkers = [], municipalities = {};
+  function createIcon(css) {
+    return L.divIcon({ className:'marker '+css, iconSize:[12,12] });
+  }
 
   DATASETS.forEach(d => {
     icons[d.key] = createIcon(d.css);
     layers[d.key] = L.layerGroup().addTo(map);
+    counts[d.key] = 0;
   });
 
   function addMarker(p, d) {
     if (p.lat == null || p.lon == null) return;
 
     const m = L.marker([p.lat, p.lon], { icon: icons[d.key] });
+    m._meta = { nimi: p.nimi || '', kunta: p.kunta || '' };
 
     m.bindPopup(`
-      <strong>${p.nimi}</strong><br>
-      ${p.kunta}<br>
+      <strong>${m._meta.nimi}</strong><br>
+      ${m._meta.kunta}<br>
       <em>${d.label}</em><br><br>
       ${p.paatehtavat ? `<strong>Päätehtävät:</strong><br>${p.paatehtavat}<br><br>` : ''}
       ${p.maanpuolustusmerkitys ? `<strong>Maanpuolustusmerkitys:</strong><br>${p.maanpuolustusmerkitys}` : ''}
     `);
 
     m.datasetKey = d.key;
-    m.municipality = p.kunta;
+    m.municipality = m._meta.kunta;
 
     m.addTo(layers[d.key]);
     allMarkers.push(m);
-    municipalities[p.kunta] = true;
+    if (m._meta.kunta) municipalities.add(m._meta.kunta);
+    counts[d.key]++;
   }
 
   let loaded = 0;
@@ -169,8 +186,7 @@
     fetch(d.url)
       .then(r => r.json())
       .then(json => {
-        const arr = Array.isArray(json) ? json : json.kohteet;
-        if (!arr) return;
+        const arr = Array.isArray(json) ? json : json.kohteet || [];
         arr.forEach(p => addMarker(p, d));
       })
       .finally(() => {
@@ -178,6 +194,7 @@
         if (loaded === DATASETS.length) {
           initFilters();
           buildLegend();
+          applyFilters();
           fitAll();
         }
       });
@@ -189,7 +206,7 @@
     const c = document.getElementById('typeFilters');
     DATASETS.forEach(d => {
       const l = document.createElement('label');
-      l.innerHTML = `<input type="checkbox" id="chk-${d.key}" checked> ${d.label}`;
+      l.innerHTML = `<input type="checkbox" id="chk-${d.key}" checked> ${d.label} (${counts[d.key]})`;
       c.appendChild(l);
       document.getElementById(`chk-${d.key}`).onchange = applyFilters;
     });
@@ -198,7 +215,7 @@
     document.getElementById('deselectAll').onclick = () => setAllTypes(false);
 
     const sel = document.getElementById('municipalityFilter');
-    Object.keys(municipalities).sort().forEach(k => {
+    [...municipalities].sort().forEach(k => {
       const o = document.createElement('option');
       o.value = k;
       o.textContent = k;
@@ -220,11 +237,18 @@
       if (document.getElementById(`chk-${d.key}`).checked) active[d.key] = true;
     });
 
+    const visible = [];
     allMarkers.forEach(m => {
       const show = active[m.datasetKey] && (!mun || m.municipality === mun);
-      if (show) m.addTo(layers[m.datasetKey]);
-      else layers[m.datasetKey].removeLayer(m);
+      if (show) {
+        m.addTo(layers[m.datasetKey]);
+        visible.push(m);
+      } else {
+        layers[m.datasetKey].removeLayer(m);
+      }
     });
+
+    updateBottomBar(visible);
   }
 
   function buildLegend() {
@@ -235,10 +259,26 @@
     });
   }
 
+  function updateBottomBar(markers) {
+    const bar = document.getElementById('bottomBar');
+    if (!markers.length) {
+      bar.innerHTML = '<em>Ei valittuja kohteita</em>';
+      return;
+    }
+
+    let html = '<table><thead><tr><th>Nimi</th><th>Kunta</th></tr></thead><tbody>';
+    markers.forEach(m => {
+      html += `<tr title="Klikkaa kohdetta kartalla"><td>${m._meta.nimi}</td><td>${m._meta.kunta}</td></tr>`;
+    });
+    html += '</tbody></table>';
+    bar.innerHTML = html;
+  }
+
   function fitAll() {
-    if (allMarkers.length) map.fitBounds(L.featureGroup(allMarkers).getBounds(), { padding: [20,20] });
+    if (allMarkers.length) {
+      map.fitBounds(L.featureGroup(allMarkers).getBounds(), { padding:[20,20] });
+    }
   }
 </script>
-
 </body>
 </html>

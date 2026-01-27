@@ -1,6 +1,5 @@
 [
-  { "nimi":"Saab","kunta":"Tampere","tyyppi":"puolustusteollisuus","lat":61.4967,"lon":23.7603,"paatehtavat":"Puolustusvoimien ICT-järjestelmien tuki","maanpuolustusmerkitys":"Suorituskykyjen tekninen toteutus ja tuki" },
-  { "nimi":"Patria","kunta":"Tampere","tyyppi":"puolustusteollisuus","lat":61.4886,"lon":23.7796,"paatehtavat":"Puolustusvoimien ICT-järjestelmien tuki","maanpuolustusmerkitys":"Suorituskykyjen tekninen toteutus ja tuki" },
-  { "nimi":"Millog","kunta":"Tampere","tyyppi":"puolustusteollisuus","lat":61.4886,"lon":23.7796,"paatehtavat":"Täydennetään","maanpuolustusmerkitys":"Täydennetään" },
-  { "nimi":"Insta","kunta":"Tampere","tyyppi":"puolustusteollisuus","lat":61.4309,"lon":23.7859,"paatehtavat":"Täydennetään","maanpuolustusmerkitys":"Täydennetään" }
+  { "nimi":"Patria","kunta":"Tampere","tyyppi":"puolustusteollisuus","lat":61.4899,"lon":23.7722,"paatehtavat":"Puolustusvoimien strateginen kumppani","maanpuolustusmerkitys":"Strategisen kumppanin poikkeusolojen tehtävät" },
+  { "nimi":"Millog","kunta":"Tampere","tyyppi":"puolustusteollisuus","lat":61.4892,"lon":23.7718,"paatehtavat":"Puolustusvoimien strateginen kumppani","maanpuolustusmerkitys":"Strategisen kumppanin poikkeusolojen tehtävät" },
+  { "nimi":"Insta","kunta":"Tampere","tyyppi":"puolustusteollisuus","lat":61.4606,"lon":23.7488,"paatehtavat":"Puolustusvoimien strateginen kumppani","maanpuolustusmerkitys":"Strategisen kumppanin poikkeusolojen tehtävät" }
 ]

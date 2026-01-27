@@ -1,3 +1,4 @@
 [
-  { "nimi": "Tulli", "kunta": "Tampere (Pirkkala)", "tyyppi": "tulli", "lat": 61.6242, "lon": 23.5231, "paatehtavat": "Tullitoiminta Tampere-Pirkkalan lentoasemalla", "maanpuolustusmerkitys": "Tullitoiminta Tampere-Pirkkalan lentoasemalla" }
+  { "nimi": "Tulli", "kunta": "Tampere (Pirkkala)", "tyyppi": "tulli", "lat": 61.4148, "lon": 23.6046, "paatehtavat": "Tullitoiminta Tampere-Pirkkalan lentoasemalla", "maanpuolustusmerkitys": "Tullitoiminta Tampere-Pirkkalan lentoasemalla" },
+  { "nimi": "Tullin toimipiste", "kunta": "Tampere", "tyyppi": "tulli", "lat": 61.4543, "lon": 23.7324, "paatehtavat": "Tullin paikallinen toiminta Tampereella", "maanpuolustusmerkitys": "Tullin paikallinen toimipiste" }
 ]
